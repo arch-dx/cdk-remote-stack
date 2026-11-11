@@ -55,6 +55,7 @@ jobs:
           name: build-artifact
           path: dist
           overwrite: true
+          include-hidden-files: true
   self-mutation:
     needs: build
     runs-on: ubuntu-latest

@@ -84,4 +84,18 @@ const common_exclude = ['cdk.out', 'cdk.context.json', 'yarn-error.log'];
 project.npmignore.exclude(...common_exclude);
 project.gitignore.exclude(...common_exclude);
 
+// actions/upload-artifact@v4 は 4.4.0 から既定で隠しファイルを上げない。build-artifact（dist）はリポジトリの
+// 写しで、.projen/tasks.json が抜けると package-js・release_npm の `npx projen package:js` が Unknown command で落ちる
+for (const [workflowName, jobId] of [['build', 'build'], ['release', 'release']]) {
+  const workflow = project.github.tryFindWorkflow(workflowName);
+  // steps は synth のときに解決する関数で持つことがある
+  const { steps } = workflow.getJob(jobId);
+  const resolvedSteps = typeof steps === 'function' ? steps() : steps;
+  const index = resolvedSteps.findIndex((step) => step.uses?.startsWith('actions/upload-artifact@') && step.with?.name === 'build-artifact');
+  if (index < 0) {
+    throw new Error(`${workflowName} の ${jobId} に build-artifact の upload-artifact が見つからない`);
+  }
+  workflow.file.addOverride(`jobs.${jobId}.steps.${index}.with.include-hidden-files`, true);
+}
+
 project.synth();
