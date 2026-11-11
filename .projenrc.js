@@ -1,6 +1,6 @@
 const { awscdk, DevEnvironmentDockerImage, Gitpod } = require('projen');
 
-const PROJECT_NAME = 'cdk-remote-stack';
+const PROJECT_NAME = '@arch-dx/cdk-remote-stack';
 const PROJECT_DESCRIPTION = 'Get outputs and AWS SSM parameters from cross-region AWS CloudFormation stacks';
 const AUTOMATION_TOKEN = 'AUTOMATION_GITHUB_TOKEN';
 
@@ -9,7 +9,8 @@ const project = new awscdk.AwsCdkConstructLibrary({
   authorEmail: 'pahudnet@gmail.com',
   name: PROJECT_NAME,
   description: PROJECT_DESCRIPTION,
-  repository: 'https://github.com/pahud/cdk-remote-stack.git',
+  repository: 'https://github.com/arch-dx/cdk-remote-stack.git',
+  npmRegistryUrl: 'https://npm.pkg.github.com',
   authorUrl: 'https://twitter.com/pahudnet',
   keywords: [
     'aws',
@@ -46,10 +47,6 @@ const project = new awscdk.AwsCdkConstructLibrary({
     announce: false,
   },
   cdkVersion: '2.85.0',
-  python: {
-    distName: 'cdk-remote-stack',
-    module: 'cdk_remote_stack',
-  },
 });
 
 const gitpodPrebuild = project.addTask('gitpod:prebuild', {

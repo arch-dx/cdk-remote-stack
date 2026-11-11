@@ -68,7 +68,7 @@ describe('RemoteOutputs', () => {
     // should have a lambda function
     t.hasResourceProperties('AWS::Lambda::Function', {
       Handler: 'remote-outputs.on_event',
-      Runtime: 'python3.9',
+      Runtime: 'python3.12',
     });
 
     // should have iam role with correct policies
@@ -121,7 +121,7 @@ describe('RemoteOutputs', () => {
     // should have a lambda function with correct timeout
     t.hasResourceProperties('AWS::Lambda::Function', {
       Handler: 'remote-outputs.on_event',
-      Runtime: 'python3.9',
+      Runtime: 'python3.12',
       Timeout: 180,
     });
   });
@@ -146,7 +146,7 @@ describe('RemoteParameters', () => {
     // should have a lambda function
     t.hasResourceProperties('AWS::Lambda::Function', {
       Handler: 'remote-parameters.on_event',
-      Runtime: 'python3.9',
+      Runtime: 'python3.12',
     });
 
     // should have iam role with correct policies
@@ -194,7 +194,7 @@ describe('RemoteParameters', () => {
     // should have a lambda function with correct timeout
     t.hasResourceProperties('AWS::Lambda::Function', {
       Handler: 'remote-parameters.on_event',
-      Runtime: 'python3.9',
+      Runtime: 'python3.12',
       Timeout: 180,
     });
   });

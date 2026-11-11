@@ -1,9 +1,9 @@
 {
-  "name": "cdk-remote-stack",
+  "name": "@arch-dx/cdk-remote-stack",
   "description": "Get outputs and AWS SSM parameters from cross-region AWS CloudFormation stacks",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pahud/cdk-remote-stack.git"
+    "url": "https://github.com/arch-dx/cdk-remote-stack.git"
   },
   "scripts": {
     "build": "npx projen build",
@@ -19,7 +19,6 @@
     "package": "npx projen package",
     "package-all": "npx projen package-all",
     "package:js": "npx projen package:js",
-    "package:python": "npx projen package:python",
     "post-compile": "npx projen post-compile",
     "post-upgrade": "npx projen post-upgrade",
     "pre-compile": "npx projen pre-compile",
@@ -78,7 +77,7 @@
   "main": "lib/index.js",
   "license": "Apache-2.0",
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com/"
   },
   "version": "0.0.0",
   "jest": {
@@ -126,12 +125,7 @@
   "stability": "stable",
   "jsii": {
     "outdir": "dist",
-    "targets": {
-      "python": {
-        "distName": "cdk-remote-stack",
-        "module": "cdk_remote_stack"
-      }
-    },
+    "targets": {},
     "tsc": {
       "outDir": "lib",
       "rootDir": "src"
