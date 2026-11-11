@@ -1,6 +1,6 @@
 const { awscdk, DevEnvironmentDockerImage, Gitpod } = require('projen');
 
-const PROJECT_NAME = 'cdk-remote-stack';
+const PROJECT_NAME = '@arch-dx/cdk-remote-stack';
 const PROJECT_DESCRIPTION = 'Get outputs and AWS SSM parameters from cross-region AWS CloudFormation stacks';
 const AUTOMATION_TOKEN = 'AUTOMATION_GITHUB_TOKEN';
 
@@ -9,7 +9,8 @@ const project = new awscdk.AwsCdkConstructLibrary({
   authorEmail: 'pahudnet@gmail.com',
   name: PROJECT_NAME,
   description: PROJECT_DESCRIPTION,
-  repository: 'https://github.com/pahud/cdk-remote-stack.git',
+  repository: 'https://github.com/arch-dx/cdk-remote-stack.git',
+  npmRegistryUrl: 'https://npm.pkg.github.com',
   authorUrl: 'https://twitter.com/pahudnet',
   keywords: [
     'aws',
@@ -46,10 +47,6 @@ const project = new awscdk.AwsCdkConstructLibrary({
     announce: false,
   },
   cdkVersion: '2.85.0',
-  python: {
-    distName: 'cdk-remote-stack',
-    module: 'cdk_remote_stack',
-  },
 });
 
 const gitpodPrebuild = project.addTask('gitpod:prebuild', {
@@ -86,5 +83,19 @@ gitpod.addVscodeExtensions(
 const common_exclude = ['cdk.out', 'cdk.context.json', 'yarn-error.log'];
 project.npmignore.exclude(...common_exclude);
 project.gitignore.exclude(...common_exclude);
+
+// actions/upload-artifact@v4 は 4.4.0 から既定で隠しファイルを上げない。build-artifact（dist）はリポジトリの
+// 写しで、.projen/tasks.json が抜けると package-js・release_npm の `npx projen package:js` が Unknown command で落ちる
+for (const [workflowName, jobId] of [['build', 'build'], ['release', 'release']]) {
+  const workflow = project.github.tryFindWorkflow(workflowName);
+  // steps は synth のときに解決する関数で持つことがある
+  const { steps } = workflow.getJob(jobId);
+  const resolvedSteps = typeof steps === 'function' ? steps() : steps;
+  const index = resolvedSteps.findIndex((step) => step.uses?.startsWith('actions/upload-artifact@') && step.with?.name === 'build-artifact');
+  if (index < 0) {
+    throw new Error(`${workflowName} の ${jobId} に build-artifact の upload-artifact が見つからない`);
+  }
+  workflow.file.addOverride(`jobs.${jobId}.steps.${index}.with.include-hidden-files`, true);
+}
 
 project.synth();
