@@ -8,9 +8,6 @@ import {
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-// aws-cdk-lib 2.85.0 (cdkVersion) has no Runtime.PYTHON_3_12, so define the same runtime here.
-const HANDLER_RUNTIME = new lambda.Runtime('python3.12', lambda.RuntimeFamily.PYTHON, { supportsInlineCode: true });
-
 /**
  * Properties of the RemoteOutputs
  */
@@ -44,7 +41,7 @@ export class RemoteOutputs extends Construct {
     super(scope, id);
 
     const onEvent = new lambda.Function(this, 'MyHandler', {
-      runtime: HANDLER_RUNTIME,
+      runtime: lambda.Runtime.PYTHON_3_12,
       code: lambda.Code.fromAsset(path.join(__dirname, '../custom-resource-handler')),
       handler: 'remote-outputs.on_event',
       timeout: props.timeout,
@@ -125,7 +122,7 @@ export class RemoteParameters extends Construct {
     super(scope, id);
 
     const onEvent = new lambda.Function(this, 'MyHandler', {
-      runtime: HANDLER_RUNTIME,
+      runtime: lambda.Runtime.PYTHON_3_12,
       code: lambda.Code.fromAsset(path.join(__dirname, '../custom-resource-handler')),
       handler: 'remote-parameters.on_event',
       timeout: props.timeout,

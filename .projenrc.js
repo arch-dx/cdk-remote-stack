@@ -1,8 +1,7 @@
-const { awscdk, DevEnvironmentDockerImage, Gitpod } = require('projen');
+const { awscdk } = require('projen');
 
 const PROJECT_NAME = '@arch-dx/cdk-remote-stack';
 const PROJECT_DESCRIPTION = 'Get outputs and AWS SSM parameters from cross-region AWS CloudFormation stacks';
-const AUTOMATION_TOKEN = 'AUTOMATION_GITHUB_TOKEN';
 
 const project = new awscdk.AwsCdkConstructLibrary({
   authorName: 'Pahud Hsieh',
@@ -30,55 +29,23 @@ const project = new awscdk.AwsCdkConstructLibrary({
   // releaseBranches: {
   //   cdkv1: { npmDistTag: 'cdkv1', majorVersion: 1 },
   // },
-  depsUpgradeOptions: {
-    ignoreProjen: false,
-    workflowOptions: {
-      labels: ['auto-approve', 'auto-merge'],
-      secret: AUTOMATION_TOKEN,
-    },
+  // the fork keeps only the build and release workflows
+  depsUpgrade: false,
+  githubOptions: {
+    pullRequestLint: false,
   },
-  autoApproveOptions: {
-    secret: 'GITHUB_TOKEN',
-    allowedUsernames: ['pahud', 'cdk-automation'],
-  },
-  defaultReleaseBranch: 'main',
   catalog: {
     twitter: 'pahudnet',
     announce: false,
   },
-  cdkVersion: '2.85.0',
+  cdkVersion: '2.273.0',
+  // aws-cdk-lib 2.273.0 needs constructs ^10.5.0 as its peer dependency
+  constructsVersion: '10.5.0',
+  // jsii 1.x cannot read the aws-cdk-lib 2.273.0 assembly
+  jsiiVersion: '~5.9.0',
+  // jsii 5.9 and aws-cdk-lib 2.273.0 need node >= 20
+  workflowNodeVersion: '22.x',
 });
-
-const gitpodPrebuild = project.addTask('gitpod:prebuild', {
-  description: 'Prebuild setup for Gitpod',
-});
-// install and compile only, do not test or package.
-gitpodPrebuild.exec('yarn install --frozen-lockfile --check-files');
-gitpodPrebuild.exec('npx projen compile');
-
-let gitpod = new Gitpod(project, {
-  dockerImage: DevEnvironmentDockerImage.fromImage('public.ecr.aws/pahudnet/gitpod-workspace:latest'),
-  prebuilds: {
-    addCheck: true,
-    addBadge: true,
-    addLabel: true,
-    branches: true,
-    pullRequests: true,
-    pullRequestsFromForks: true,
-  },
-});
-
-gitpod.addCustomTask({
-  init: 'yarn gitpod:prebuild',
-  // always upgrade after init
-  command: 'npx projen upgrade',
-});
-
-gitpod.addVscodeExtensions(
-  'dbaeumer.vscode-eslint',
-  'ms-azuretools.vscode-docker',
-  'AmazonWebServices.aws-toolkit-vscode',
-);
 
 const common_exclude = ['cdk.out', 'cdk.context.json', 'yarn-error.log'];
 project.npmignore.exclude(...common_exclude);
